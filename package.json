@@ -7,6 +7,7 @@
   "dependencies": {
     "lodash.clonedeep": "4.5.0",
     "lodash.sortby": "4.7.0",
+    "pepjs": "0.5.2",
     "react": "16.9.0",
     "react-dom": "16.9.0",
     "react-hanger": "2.1.3",

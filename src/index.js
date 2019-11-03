@@ -1,3 +1,4 @@
+import 'pepjs'
 import React, { useState, useRef, useEffect } from 'react'
 import { render } from 'react-dom'
 import { Canvas, useThree } from 'react-three-fiber'
