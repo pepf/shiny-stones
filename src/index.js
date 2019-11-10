@@ -132,7 +132,11 @@ function App() {
 
       {!started && (
         <div className="intro">
-          <h2>Shiny stones 💎</h2>
+          <h2>
+            shiny stones
+            <br />
+            💎
+          </h2>
           <p onClick={() => setStarted(true)}>Click to play!</p>
         </div>
       )}

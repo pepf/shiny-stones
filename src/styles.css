@@ -14,17 +14,18 @@ body,
 body {
   background-color: #333;
   color: white;
-  font-family: sans-serif;
+  font-family: 'Futura', sans-serif;
 }
 
 h1,
 h2,
 h3 {
-  font-family: sans-serif;
+  font-family: 'Futura', sans-serif;
   color: white;
-  font-variant: small-caps;
+  text-transform: uppercase;
   text-align: center;
   margin: 0 auto;
+  text-shadow: 0px -4px 0 #333, 0px -8px 0 #333, 0px -12px 0 #666;
 }
 p {
   text-align: center;
@@ -34,10 +35,17 @@ p {
   position: fixed;
   left: calc(50vw - 150px);
   width: 300px;
-  height: 250px;
-  top: 40vh;
+  min-height: 250px;
+  top: 30vh;
   font-size: 2em;
+  padding: 2rem;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.33);
 }
 .intro > p {
   cursor: pointer;
+}
+.intro > p:hover {
+  cursor: pointer;
+  text-decoration: underline;
 }
