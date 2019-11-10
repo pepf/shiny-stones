@@ -8,14 +8,18 @@ type ThingProps = {
   active: boolean
   onClick: (e: MouseEvent, type: ThingProps['type']) => void
 }
+const geometries = ['octahedron', 'icosahedron', 'octahedron', 'dodecahedron', 'tetrahedron']
+
 const Thing: React.FC<ThingProps> = props => {
-  const Geometry = useMemo(() => `${props.type > 2 ? 'octahedron' : 'icosahedron'}BufferGeometry`, [props.type])
+  const Geometry = useMemo(() => `${geometries[props.type]}BufferGeometry`, [props.type])
   const [hover, setHover] = useState(false)
   const [init, setInit] = useState(false)
-  const { scale, rotation, position } = useSpring({
+  const color = ['red', 'green', 'blue', 'purple', 'orange'][props.type]
+  const { scale, rotation, position, metalness, emissive } = useSpring({
     position: init ? props.position : [props.position[0], props.position[1] + 0.5, props.position[2]],
     scale: props.active ? [1.2, 1.2, 1.2] : [1, 1, 1],
-    rotation: hover ? ThreeMath.degToRad(90) : 0
+    rotation: hover ? ThreeMath.degToRad(90) : 0,
+    metalness: props.active ? 0 : 0.5
   })
 
   useEffect(() => {
@@ -24,8 +28,6 @@ const Thing: React.FC<ThingProps> = props => {
       // console.log('cleanup!')
     }
   }, [])
-
-  const color = ['red', 'green', 'blue', 'purple', 'orange'][props.type]
 
   return (
     <group>
@@ -39,7 +41,7 @@ const Thing: React.FC<ThingProps> = props => {
         onPointerOver={e => setHover(true)}
         onPointerOut={e => setHover(false)}>
         <Geometry attach="geometry" args={[0.5, 0]} />
-        <animated.meshPhysicalMaterial attach="material" color={color} clearcoat={0} clearcoatRoughness={0.5} />
+        <animated.meshStandardMaterial attach="material" color={color} roughness={0.5} metalness={metalness} />
       </animated.mesh>
       {props.active ? (
         <animated.mesh position={position}>

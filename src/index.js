@@ -38,26 +38,36 @@ const ComponentGrid = ({ component, width, height }) => {
           // Return on no match
           if (!matchA && !matchB) return
 
-          // Remove matches, push gems down
-          const gridWithoutMatches = [matchA, matchB].reduce((_grid, match) => {
-            if (!match) return _grid
-            gridModel._grid = _grid.removeMatch(match)
-            return gridModel
-          }, gridModel)
+          // Recursive function dealing with matches, filling the grid back up
+          // And dealing with matches resulting from that...
+          const processMatches = (matches = []) => {
+            // Remove matches, push gems down
+            const gridWithoutMatches = matches.reduce((_grid, match) => {
+              if (!match) return _grid
+              gridModel._grid = _grid.removeMatch(match)
+              return gridModel
+            }, gridModel)
 
-          // Delay every step a bit so react-spring animations are visible
-          // There's probably a better way but this seems to work exactly right :)
-          setTimeout(() => {
-            setGrid(gridWithoutMatches._grid)
+            // Delay every step a bit so react-spring animations are visible
+            // There's probably a better way but this seems to work exactly right :)
             setTimeout(() => {
-              setGrid(gridModel.moveDown())
+              setGrid(gridWithoutMatches._grid)
               setTimeout(() => {
-                setGrid(gridModel.fill())
+                setGrid(gridModel.moveDown())
+                setTimeout(() => {
+                  setGrid(gridModel.fill())
+                  const chainMatches = gridModel.findAllMatches()
+                  if (chainMatches.length > 0) {
+                    // Recurse here
+                    console.log(chainMatches.length, ' chain matches found')
+                    processMatches(chainMatches)
+                  }
+                }, 200)
               }, 200)
             }, 200)
-          }, 200)
+          }
 
-          // @TODO fill up new gems
+          processMatches([matchA, matchB])
         }
       } catch (e) {
         console.warn(e.toString())
@@ -86,6 +96,7 @@ const ComponentGrid = ({ component, width, height }) => {
   return <group position={[-3.33, 0, 0]}>{gridComponent}</group>
 }
 
+// Seems to fit the grid +/- to screen on mobile and desktop
 const CameraTweaker = () => {
   const { camera, viewport } = useThree()
   useEffect(() => {

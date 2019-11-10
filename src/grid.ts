@@ -44,7 +44,7 @@ class Grid {
     return this.arrayGridFrom()
   }
 
-  private arrayGridFrom = grid => {
+  private arrayGridFrom = (grid?: GridItem[]) => {
     grid = grid || this._grid
     const arrayGrid = new Array(this._height).fill(null).map((_, indexY) =>
       new Array(this._width).fill(null).map((__, indexX) => {
@@ -84,13 +84,24 @@ class Grid {
   }
 
   findAllMatches(): Array<GridItem[]> {
-    return this._grid.reduce((prev: Array<GridItem[]>, gridItem) => {
+    const marked: Array<String> = []
+    const matches = this._grid.reduce((prev: Array<GridItem[]>, gridItem) => {
+      // if this is already part of another match, skip
+      if (marked.includes(gridItem.id)) return prev
+
+      // expensive, check for match
       const match = this.findMatchForField(gridItem.pos)
       if (match) {
+        const matchIds = match.map(m => m.id)
+        marked.push(...matchIds)
         prev.push(match)
+      } else {
+        marked.push(gridItem.id)
       }
       return prev
     }, [])
+
+    return matches
   }
 
   findMatchForField([x, y]: Position): GridItem[] {
