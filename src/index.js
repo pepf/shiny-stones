@@ -18,7 +18,9 @@ const ComponentGrid = ({ component, width, height }) => {
     setGrid(gridInstance.current._grid)
 
     // cleanup
-    return () => {}
+    return () => {
+      delete gridInstance.current
+    }
   }, [width, height])
 
   const swapStack = useArray([])
@@ -110,21 +112,31 @@ const CameraTweaker = () => {
 }
 
 function App() {
+  const [started, setStarted] = useState(false)
   return (
-    <Canvas shadowMap camera={{ position: [0, 3, 7], aspect: 1 }}>
-      <CameraTweaker />
-      <ambientLight color="white" intensity={0.3} />
-      <pointLight castShadow color="red" position={[-5, 0, 1]} intensity={0.2} />
-      <pointLight castShadow color="blue" position={[5, 0, 1]} intensity={0.2} />
-      <pointLight castShadow color="white" position={[0, 10, 5]} intensity={0.5} />
-      <ComponentGrid width={7} height={7} />
+    <>
+      <Canvas shadowMap camera={{ position: [0, 3, 7], aspect: 1 }}>
+        <CameraTweaker />
+        <ambientLight color="white" intensity={0.3} />
+        <pointLight castShadow color="red" position={[-5, 0, 1]} intensity={0.2} />
+        <pointLight castShadow color="blue" position={[5, 0, 1]} intensity={0.2} />
+        <pointLight castShadow color="white" position={[0, 10, 5]} intensity={0.5} />
+        {started ? <ComponentGrid width={7} height={7} /> : null}
 
-      {/* Shadows on a plane */}
-      <mesh receiveShadow position-z={-15} rotation-x={ThreeMath.degToRad(-85)}>
-        <planeBufferGeometry attach="geometry" args={[1000, 1000]} />
-        <meshPhongMaterial attach="material" color="grey" />
-      </mesh>
-    </Canvas>
+        {/* Shadows on a plane */}
+        <mesh receiveShadow position-z={-15} rotation-x={ThreeMath.degToRad(-85)}>
+          <planeBufferGeometry attach="geometry" args={[1000, 1000]} />
+          <meshPhongMaterial attach="material" color="grey" />
+        </mesh>
+      </Canvas>
+
+      {!started && (
+        <div className="intro">
+          <h2>Shiny stones 💎</h2>
+          <p onClick={() => setStarted(true)}>Click to play!</p>
+        </div>
+      )}
+    </>
   )
 }
 
