@@ -3,13 +3,14 @@ import React, { useState, useRef, useEffect } from 'react'
 import { render } from 'react-dom'
 import { Canvas, useThree } from 'react-three-fiber'
 import { Math as ThreeMath } from 'three'
+import { useSpring, animated } from 'react-spring'
 import { useArray } from 'react-hanger'
 
 import Grid from './grid'
 import Thing from './components/Thing'
 import './styles.css'
 
-const ComponentGrid = ({ component, width, height }) => {
+const ComponentGrid = ({ width, height, setScore }) => {
   const gridInstance = useRef(null)
   const [grid, setGrid] = useState(null)
 
@@ -46,6 +47,7 @@ const ComponentGrid = ({ component, width, height }) => {
             // Remove matches, push gems down
             const gridWithoutMatches = matches.reduce((_grid, match) => {
               if (!match) return _grid
+              if (match.length) setScore(prevScore => prevScore + match.length * 10)
               gridModel._grid = _grid.removeMatch(match)
               return gridModel
             }, gridModel)
@@ -61,7 +63,7 @@ const ComponentGrid = ({ component, width, height }) => {
                   const chainMatches = gridModel.findAllMatches()
                   if (chainMatches.length > 0) {
                     // Recurse here
-                    console.log(chainMatches.length, ' chain matches found')
+                    // console.log(chainMatches.length, ' chain matches found')
                     processMatches(chainMatches)
                   }
                 }, 200)
@@ -112,16 +114,24 @@ const CameraTweaker = () => {
 }
 
 function App() {
-  const [started, setStarted] = useState(false)
+  const [started, setStarted] = useState(true)
+  const [score, setScore] = useState(0)
+  const hud = useSpring({ score, from: { score: 0 } })
+
   return (
     <>
       <Canvas shadowMap camera={{ position: [0, 3, 7], aspect: 1 }}>
         <CameraTweaker />
-        <ambientLight color="white" intensity={0.3} />
-        <pointLight castShadow color="red" position={[-5, 0, 1]} intensity={0.2} />
-        <pointLight castShadow color="blue" position={[5, 0, 1]} intensity={0.2} />
-        <pointLight castShadow color="white" position={[0, 10, 5]} intensity={0.5} />
-        {started ? <ComponentGrid width={7} height={7} /> : null}
+        <ambientLight color="white" intensity={0.2} />
+        <directionalLight color="white" intensity={0.75} position={[0, 10, 10]}>
+          <mesh attach="target" position={[0, 2, 0]} />
+        </directionalLight>
+        <pointLight castShadow color="red" position={[-5, 0, 5]} intensity={0.2} />
+        <pointLight castShadow color="blue" position={[5, 0, 5]} intensity={0.2} />
+        <pointLight castShadow color="white" position={[-1, 0, 5]} intensity={0.2} />
+        <pointLight castShadow color="white" position={[1, 0, 5]} intensity={0.2} />
+        {/* <pointLight castShadow color="white" position={[0, 10, 5]} intensity={1} /> */}
+        {started ? <ComponentGrid width={7} height={7} setScore={setScore} /> : null}
 
         {/* Shadows on a plane */}
         <mesh receiveShadow position-z={-15} rotation-x={ThreeMath.degToRad(-85)}>
@@ -129,6 +139,11 @@ function App() {
           <meshPhongMaterial attach="material" color="grey" />
         </mesh>
       </Canvas>
+
+      <span className="score">
+        Score:&nbsp;
+        <animated.span>{hud.score.interpolate(val => Math.floor(val).toString())}</animated.span>
+      </span>
 
       {!started && (
         <div className="intro">

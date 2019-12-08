@@ -12,7 +12,7 @@ body,
 }
 
 body {
-  background-color: #333;
+  background-color: #555;
   color: white;
   font-family: 'Futura', sans-serif;
 }
@@ -48,4 +48,11 @@ p {
 .intro > p:hover {
   cursor: pointer;
   text-decoration: underline;
+}
+
+.score {
+  color: white;
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
 }
