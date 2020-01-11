@@ -8,13 +8,15 @@ type ThingProps = {
   active: boolean
   onClick: (e: MouseEvent, type: ThingProps['type']) => void
 }
+
+const colors = ['#730943', '#A444A6', '#21BFA2', '#D92D07', '#F2E422']
 const geometries = ['octahedron', 'icosahedron', 'octahedron', 'dodecahedron', 'tetrahedron']
 
 const Thing: React.FC<ThingProps> = props => {
   const Geometry = useMemo(() => `${geometries[props.type]}BufferGeometry`, [props.type])
   const [hover, setHover] = useState(false)
   const [init, setInit] = useState(false)
-  const color = ['red', 'green', 'blue', 'purple', 'orange'][props.type]
+  const color = colors[props.type]
   const { scale, rotation, position } = useSpring({
     position: init ? props.position : [props.position[0], props.position[1] + 0.5, props.position[2]],
     scale: props.active ? [1.2, 1.2, 1.2] : [1, 1, 1],

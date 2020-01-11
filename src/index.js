@@ -114,7 +114,7 @@ const CameraTweaker = () => {
 }
 
 function App() {
-  const [started, setStarted] = useState(true)
+  const [started, setStarted] = useState(false)
   const [score, setScore] = useState(0)
   const hud = useSpring({ score, from: { score: 0 } })
 
@@ -136,7 +136,7 @@ function App() {
         {/* Shadows on a plane */}
         <mesh receiveShadow position-z={-15} rotation-x={ThreeMath.degToRad(-85)}>
           <planeBufferGeometry attach="geometry" args={[1000, 1000]} />
-          <meshPhongMaterial attach="material" color="grey" />
+          <meshPhongMaterial attach="material" color="#333" />
         </mesh>
       </Canvas>
 
