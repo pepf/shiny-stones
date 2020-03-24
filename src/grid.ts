@@ -78,7 +78,7 @@ class Grid {
     const index2 = grid.findIndex(item => item.id === item2.id)
     grid[index1].pos = [x2, y2]
     grid[index2].pos = [x1, y1]
-
+    console.log("swapped ", [x2, y2], "with", [x1, y1])
     this._grid = grid
     return grid
   }

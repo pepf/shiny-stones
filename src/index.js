@@ -2,9 +2,11 @@ import 'pepjs'
 import React, { useState, useRef, useEffect } from 'react'
 import { render } from 'react-dom'
 import { Canvas, useThree } from 'react-three-fiber'
-import { Math as ThreeMath } from 'three'
 import { useSpring, animated } from 'react-spring'
 import { useArray } from 'react-hanger'
+// import { useUpdate } from 'react-use'
+import { Math as ThreeMath } from 'three'
+import cloneDeep from 'lodash.clonedeep'
 
 import Grid from './grid'
 import Thing from './components/Thing'
@@ -25,12 +27,17 @@ const ComponentGrid = ({ width, height, setScore }) => {
   }, [width, height])
 
   const swapStack = useArray([])
+  // const upd = useUpdate()
+  // useTimeoutFn()
+  // const [isReady, cancel, reset] = useTimeoutFn(fn, 250);
 
   useEffect(() => {
     const gridModel = gridInstance.current
+    console.log('swapstack value: ', swapStack.value)
     if (swapStack.value.length === 2) {
       try {
         swapStack.clear()
+        const beforeGrid = cloneDeep(gridModel._grid)
         const newGrid = gridModel.swapPositions(swapStack.value[0], swapStack.value[1])
         if (newGrid) {
           setGrid(newGrid)
@@ -38,8 +45,19 @@ const ComponentGrid = ({ width, height, setScore }) => {
           const matchA = gridModel.findMatchForField(swapStack.value[0].pos)
           const matchB = gridModel.findMatchForField(swapStack.value[1].pos)
 
-          // Return on no match
-          if (!matchA && !matchB) return
+          // @todo Swap back on no match, figure out hooks?
+          if (!matchA && !matchB) {
+            setTimeout(() => {
+              // console.log('no match, reverting..')
+              // console.log(swapStack)
+              // const revertGrid = gridModel.swapPositions(swapStack.value[1], swapStack.value[0])
+              console.log('no matches, reverting..')
+              setGrid(beforeGrid)
+            }, 250)
+            return () => {
+              console.log('stopping early because no match')
+            }
+          }
 
           // Recursive function dealing with matches, filling the grid back up
           // And dealing with matches resulting from that...
@@ -63,7 +81,6 @@ const ComponentGrid = ({ width, height, setScore }) => {
                   const chainMatches = gridModel.findAllMatches()
                   if (chainMatches.length > 0) {
                     // Recurse here
-                    // console.log(chainMatches.length, ' chain matches found')
                     processMatches(chainMatches)
                   }
                 }, 200)
@@ -78,7 +95,11 @@ const ComponentGrid = ({ width, height, setScore }) => {
         console.warn(e.stack)
       }
     }
-  }, [swapStack])
+
+    return () => {
+      console.log('dropping useEffect hook')
+    }
+  }, [swapStack, setGrid, setScore])
 
   if (!grid) return null
   const spacing = 0.2
@@ -107,9 +128,10 @@ const CameraTweaker = () => {
     const baseFOV = 75
     const multiplier = (11 / viewport.width) * 0.8
 
+    camera.lookAt(0, 3, 0)
     camera.fov = Math.max(multiplier * baseFOV, baseFOV)
     camera.updateProjectionMatrix()
-  }, [])
+  }, [camera, viewport.width])
   return null
 }
 
