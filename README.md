@@ -6,9 +6,7 @@ Experiment to use [react-three-fiber](https://github.com/react-spring/react-thre
 
 Conclusion so far; this totally seems to work, react-three-fiber makes dealing with three.js a lot easier!
 
-## Try it out here: https://f25pj.csb.app/
-
-## The code
+## Try it out and see the code here
 
 https://codesandbox.io/s/github/pepf/shiny-stones
 
