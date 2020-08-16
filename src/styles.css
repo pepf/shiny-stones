@@ -56,3 +56,9 @@ p {
   top: 1rem;
   left: 1rem;
 }
+
+.score-popup {
+  color: lightgreen;
+  position: fixed;
+  left: 4rem;
+}

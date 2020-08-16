@@ -3,13 +3,14 @@ import React, { useState, useRef, useEffect } from 'react'
 import { render } from 'react-dom'
 import { Canvas, useThree } from 'react-three-fiber'
 import { useSpring, animated } from 'react-spring'
-import { useArray } from 'react-hanger'
+import { useArray, usePrevious } from 'react-hanger'
 // import { useUpdate } from 'react-use'
 import { Math as ThreeMath } from 'three'
 import cloneDeep from 'lodash.clonedeep'
 
 import Grid from './grid'
 import Thing from './components/Thing'
+import ScorePopup from './components/ScorePopup'
 import './styles.css'
 
 const ComponentGrid = ({ width, height, setScore }) => {
@@ -65,7 +66,7 @@ const ComponentGrid = ({ width, height, setScore }) => {
             // Remove matches, push gems down
             const gridWithoutMatches = matches.reduce((_grid, match) => {
               if (!match) return _grid
-              if (match.length) setScore(prevScore => prevScore + match.length * 10)
+              if (match.length) setScore((prevScore) => prevScore + match.length * 10)
               gridModel._grid = _grid.removeMatch(match)
               return gridModel
             }, gridModel)
@@ -97,15 +98,15 @@ const ComponentGrid = ({ width, height, setScore }) => {
     }
 
     return () => {
-      console.log('dropping useEffect hook')
+      // console.log('dropping useEffect hook')
     }
   }, [swapStack, setGrid, setScore])
 
   if (!grid) return null
   const spacing = 0.2
-  const gridComponent = grid.map(item => {
+  const gridComponent = grid.map((item) => {
     const [x, y] = item.pos
-    const active = swapStack.value.find(stackItem => stackItem && stackItem.id === item.id)
+    const active = swapStack.value.find((stackItem) => stackItem && stackItem.id === item.id)
     return (
       <Thing
         key={item.id}
@@ -138,6 +139,16 @@ const CameraTweaker = () => {
 function App() {
   const [started, setStarted] = useState(false)
   const [score, setScore] = useState(0)
+  const prevScore = usePrevious(score)
+  const scorePopups = useArray([])
+
+  useEffect(() => {
+    const diff = score - prevScore
+    if (diff > 0) {
+      scorePopups.push({ id: Math.floor(Math.random() * 10000), value: diff })
+    }
+  }, [score, prevScore])
+
   const hud = useSpring({ score, from: { score: 0 } })
 
   return (
@@ -152,7 +163,6 @@ function App() {
         <pointLight castShadow color="blue" position={[5, 0, 5]} intensity={0.2} />
         <pointLight castShadow color="white" position={[-1, 0, 5]} intensity={0.2} />
         <pointLight castShadow color="white" position={[1, 0, 5]} intensity={0.2} />
-        {/* <pointLight castShadow color="white" position={[0, 10, 5]} intensity={1} /> */}
         {started ? <ComponentGrid width={7} height={7} setScore={setScore} /> : null}
 
         {/* Shadows on a plane */}
@@ -164,8 +174,12 @@ function App() {
 
       <span className="score">
         Score:&nbsp;
-        <animated.span>{hud.score.interpolate(val => Math.floor(val).toString())}</animated.span>
+        <animated.span>{hud.score.interpolate((val) => Math.floor(val).toString())}</animated.span>
       </span>
+
+      {scorePopups.value.map((scorePopup) => (
+        <ScorePopup key={scorePopup.id} {...scorePopup} onRemove={() => scorePopups.removeById(scorePopup.id)} />
+      ))}
 
       {!started && (
         <div className="intro">

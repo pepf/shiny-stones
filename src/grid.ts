@@ -48,7 +48,7 @@ class Grid {
     grid = grid || this._grid
     const arrayGrid = new Array(this._height).fill(null).map((_, indexY) =>
       new Array(this._width).fill(null).map((__, indexX) => {
-        const item = grid.find(item => item.pos[0] === indexX && item.pos[1] === indexY)
+        const item = grid.find((item) => item.pos[0] === indexX && item.pos[1] === indexY)
         return item
       })
     )
@@ -57,7 +57,7 @@ class Grid {
   }
 
   getItemAt([x, y]: Position) {
-    return this._grid.find(item => item.pos[0] === x && item.pos[1] === y) || null
+    return this._grid.find((item) => item.pos[0] === x && item.pos[1] === y) || null
   }
 
   swapPositions(item1: GridItem, item2: GridItem) {
@@ -74,11 +74,11 @@ class Grid {
       return
     }
 
-    const index1 = grid.findIndex(item => item.id === item1.id)
-    const index2 = grid.findIndex(item => item.id === item2.id)
+    const index1 = grid.findIndex((item) => item.id === item1.id)
+    const index2 = grid.findIndex((item) => item.id === item2.id)
     grid[index1].pos = [x2, y2]
     grid[index2].pos = [x1, y1]
-    console.log("swapped ", [x2, y2], "with", [x1, y1])
+    console.log('swapped ', [x2, y2], 'with', [x1, y1])
     this._grid = grid
     return grid
   }
@@ -92,7 +92,7 @@ class Grid {
       // expensive, check for match
       const match = this.findMatchForField(gridItem.pos)
       if (match) {
-        const matchIds = match.map(m => m.id)
+        const matchIds = match.map((m) => m.id)
         marked.push(...matchIds)
         prev.push(match)
       } else {
@@ -122,7 +122,7 @@ class Grid {
         }
 
         if (item && type === item.type) {
-          if (!match.find(m => m.id === item.id)) {
+          if (!match.find((m) => m.id === item.id)) {
             match.push(cloneDeep(item))
           }
           const newX = axis === 'x' ? (incr ? x + 1 : x - 1) : x
@@ -144,15 +144,15 @@ class Grid {
     // Only match if it contains more than MATCH_LENGTH gems
     if (match.length > 0 && match.length >= this.MATCH_LENGTH) {
       // return match in normalized structure
-      return sortBy(match, [match => match.pos[0], match => match.pos[1]])
+      return sortBy(match, [(match) => match.pos[0], (match) => match.pos[1]])
     }
     return null
   }
 
   removeMatch(match: GridItem[]) {
     let grid = cloneDeep(this._grid)
-    const ids = match.map(m => m.id)
-    grid = grid.filter(item => !ids.includes(item.id))
+    const ids = match.map((m) => m.id)
+    grid = grid.filter((item) => !ids.includes(item.id))
     return grid
   }
 
@@ -167,7 +167,7 @@ class Grid {
           if (!item) {
             const oneUp = (arrayGrid[indexY + 1] && arrayGrid[indexY + 1][indexX]) || null
             if (oneUp) {
-              const itemIndex = grid.findIndex(item => item.id === oneUp.id)
+              const itemIndex = grid.findIndex((item) => item.id === oneUp.id)
               grid[itemIndex].pos = [indexX, indexY]
               clean = false
             }
@@ -192,7 +192,7 @@ class Grid {
 
     const indexY = arrayGrid.length - 1
     arrayGrid[indexY].forEach((item, indexX) => {
-      for (let y = indexY; typeof arrayGrid[y][indexX] === 'undefined'; y--) {
+      for (let y = indexY; typeof arrayGrid[y]?.[indexX] === 'undefined'; y--) {
         const item = this._createItem(indexX, y)
         grid.push(item)
       }
